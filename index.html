@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rotina Semanal</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+
+    <script defer src="script.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Minha Rotina Semanal</h1>
+    </header>
+
+    <main>
+        <div id="semana" class="semana-container">
+            <!-- Gerado via JS -->
+        </div>
+
+        <div id="horas-container" class="horas-container hidden">
+            <button id="btn-voltar" class="voltar">← Voltar</button>
+            <h2 id="titulo-dia"></h2>
+
+            <div id="grade-horas" class="grade-horas">
+                <!-- Gerado via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para adicionar atividade -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="modal-hora"></h3>
+            <input id="input-atividade" placeholder="Ex: Estudar, Treinar..." />
+            
+            <label class="notif">
+                <input type="checkbox" id="ativar-notificacao" />
+                Ativar lembrete dessa atividade
+            </label>
+
+            <button id="salvar">Salvar</button>
+            <button id="cancelar" class="cancelar">Cancelar</button>
+        </div>
+    </div>
+
+</body>
+</html>

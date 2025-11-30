@@ -1,0 +1,89 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+}
+
+header {
+    background: #007bff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.semana-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    padding: 20px;
+}
+
+.dia {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 0 5px #0003;
+}
+
+.dia:hover {
+    background: #e8f1ff;
+}
+
+.horas-container {
+    padding: 20px;
+}
+
+.voltar {
+    padding: 8px 12px;
+    margin-bottom: 10px;
+}
+
+.grade-horas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.hora {
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 5px #0003;
+}
+
+.hora:hover {
+    background: #e8f1ff;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0007;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+}
+
+.hidden {
+    display: none;
+}
+
+.notif {
+    display: flex;
+    margin: 10px 0;
+    gap: 8px;
+}
