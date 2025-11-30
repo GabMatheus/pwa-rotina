@@ -1,89 +1,205 @@
+/* ----- RESET ----- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
+  font-family: "Inter", Arial, sans-serif;
+  background: #111;
+  color: #eee;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 40px;
 }
 
+/* ----- HEADER ----- */
 header {
-    background: #007bff;
-    color: white;
-    padding: 20px;
-    text-align: center;
+  background: #1a1a1a;
+  padding: 20px 16px;
+  text-align: center;
+  border-bottom: 1px solid #333;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
 }
 
+header h1 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* ----- CONTAINER PRINCIPAL ----- */
+main {
+  padding: 16px;
+}
+
+/* ----- SEMANA (dias) ----- */
 .semana-container {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
-    padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* mobile */
+  gap: 14px;
 }
 
 .dia {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: center;
-    box-shadow: 0 0 5px #0003;
+  background: #1c1c1c;
+  padding: 18px;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid #292929;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  transition: all 0.15s ease;
 }
 
 .dia:hover {
-    background: #e8f1ff;
+  background: #262626;
+  transform: translateY(-4px);
 }
 
+/* Tablets e desktop */
+@media (min-width: 640px) {
+  .semana-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ----- HORAS ----- */
 .horas-container {
-    padding: 20px;
+  margin-top: 16px;
 }
 
 .voltar {
-    padding: 8px 12px;
-    margin-bottom: 10px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #222;
+  color: #ccc;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid #333;
+}
+
+.voltar:hover {
+  background: #2e2e2e;
+}
+
+#titulo-dia {
+  font-size: 18px;
+  margin: 12px 0;
+  font-weight: 600;
 }
 
 .grade-horas {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr); /* mobile */
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .grade-horas {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .hora {
-    background: white;
-    padding: 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 0 5px #0003;
+  background: #1c1c1c;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid #292929;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .hora:hover {
-    background: #e8f1ff;
+  background: #262626;
+  transform: scale(1.02);
 }
 
-/* Modal */
+.hora small {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.hora .texto-atividade {
+  margin-top: 6px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Ícone de notificação */
+.hora .notif-icone {
+  font-size: 12px;
+  color: #4fa3ff;
+  margin-top: 4px;
+}
+
+/* ----- MODAL ----- */
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #0007;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  padding: 16px;
 }
 
 .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid #333;
+  box-shadow: 0 8px 35px rgba(0,0,0,0.6);
 }
 
-.hidden {
-    display: none;
+.modal-content h3 {
+  margin-bottom: 12px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.modal-content input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #3a3a3a;
+  background: #121212;
+  color: #eee;
+  margin-bottom: 12px;
 }
 
 .notif {
-    display: flex;
-    margin: 10px 0;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.modal-content button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.salvar {
+  background: #007bff;
+  color: white;
+}
+
+.cancelar {
+  background: #333;
+  color: #ccc;
+}
+
+.hidden {
+  display: none;
 }
