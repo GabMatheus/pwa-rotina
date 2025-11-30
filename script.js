@@ -1,6 +1,6 @@
 /* ========= Config ======= */
-const FIRST_HOUR = 6;
-const LAST_HOUR = 22;
+const FIRST_HOUR = 5;
+const LAST_HOUR = 23;
 const STEP_MIN = 30; // 30 em 30 minutos
 
 /* ========= Util ======= */
