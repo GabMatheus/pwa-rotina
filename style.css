@@ -1,205 +1,108 @@
-/* ----- RESET ----- */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* RESET BASIC */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0f;
+  --card:#141416;
+  --muted:#9aa0a6;
+  --accent:#0ea5ff;
+  --glass: rgba(255,255,255,0.03);
+  --shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+body{
+  background:linear-gradient(180deg,#08080a 0%, #0f0f11 100%);
+  color:#eef2f6;
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  padding-bottom:40px;
 }
 
-body {
-  font-family: "Inter", Arial, sans-serif;
-  background: #111;
-  color: #eee;
-  -webkit-font-smoothing: antialiased;
-  padding-bottom: 40px;
+/* HEADER */
+header{
+  position:sticky;top:0;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  backdrop-filter: blur(6px); padding:14px 12px; border-bottom:1px solid rgba(255,255,255,0.03);
+  z-index:20;
+}
+.cabecalho-inner{display:flex;align-items:center;justify-content:center;gap:12px}
+.mes-ano{font-weight:700;font-size:16px}
+.nav-btn{
+  background:var(--card);border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;color:#dfe7ee;cursor:pointer;
+  box-shadow: var(--shadow);
+}
+.acoes{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.acao-btn{
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border:1px solid rgba(255,255,255,0.03);
+  padding:8px 12px;border-radius:10px;color:var(--muted);font-weight:600;font-size:13px;cursor:pointer;
+  transition:transform .12s ease, background .12s ease;
+}
+.acao-btn:hover{transform:translateY(-3px);color:#fff}
+
+/* CALENDAR WRAP */
+main{padding:12px}
+.calendario-wrap{max-width:980px;margin:0 auto}
+.dias-nomes{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:8px;color:var(--muted);font-size:13px;text-align:center;padding:0 6px}
+.grid-calendario{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:12px;
 }
 
-/* ----- HEADER ----- */
-header {
-  background: #1a1a1a;
-  padding: 20px 16px;
-  text-align: center;
-  border-bottom: 1px solid #333;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+/* DAY CARD */
+.dia-card{
+  background:linear-gradient(180deg, var(--card), rgba(255,255,255,0.01));
+  border-radius:14px;padding:10px;min-height:86px;cursor:pointer;border:1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  transition: transform .14s ease, box-shadow .14s ease, background .12s;
+  display:flex;flex-direction:column;gap:8px;
+  position:relative;overflow:hidden;
+}
+.dia-card:hover{
+  transform:translateY(-6px) scale(1.01);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+  background: linear-gradient(180deg, #1b1b1d, rgba(255,255,255,0.02));
+}
+.dia-top{display:flex;justify-content:space-between;align-items:center}
+.dia-num{font-weight:800;font-size:20px}
+.dia-week{font-size:12px;color:var(--muted);opacity:.95}
+.past{opacity:.32;filter:grayscale(.3);cursor:not-allowed}
+
+/* activity preview */
+.preview{
+  margin-top:auto;font-size:13px;color:#dbe8ff;display:flex;flex-direction:column;gap:6px;
+}
+.preview .item{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.preview .texto{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e7eefb;max-width:130px}
+
+/* today highlight */
+.today {
+  outline: 2px solid rgba(14,165,255,0.12);
+  box-shadow: 0 6px 26px rgba(14,165,255,0.06);
 }
 
-header h1 {
-  font-size: 20px;
-  font-weight: 600;
+/* TELA DIA (horas) */
+.tela-dia{max-width:980px;margin:18px auto;padding:8px}
+.top-dia{display:flex;align-items:center;gap:12px}
+.voltar{background:#101214;border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px;color:#d1d6da;cursor:pointer}
+.grade-horas{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+@media(min-width:700px){ .grade-horas{grid-template-columns:repeat(3,1fr)} }
+.hora-card{
+  background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);
+  box-shadow:0 8px 22px rgba(0,0,0,0.5);cursor:pointer;display:flex;flex-direction:column;gap:8px;
 }
+.hora-card small{color:var(--muted);font-size:12px}
+.hora-card .text{font-weight:600;color:#e9f5ff}
+.hora-card .notif-icone{color:var(--accent);font-size:14px}
 
-/* ----- CONTAINER PRINCIPAL ----- */
-main {
-  padding: 16px;
-}
+/* MODAL */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:60}
+.modal-content{width:90%;max-width:420px;background:#0f0f11;border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 18px 50px rgba(0,0,0,0.7)}
+.modal-content h3{margin-bottom:10px}
+.modal-content input[type="text"]{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:#0b0b0c;color:#eef2f6;margin-bottom:12px}
+.notif{display:flex;gap:8px;align-items:center;color:var(--muted);margin-bottom:10px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.salvar{background:var(--accent);color:#001022;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+.cancelar{background:#212124;color:#dbe6f8;padding:10px 12px;border-radius:10px;border:none;cursor:pointer}
+.danger{background:#2b2b2c;color:#ffcccc;padding:10px 12px;border-radius:10px;border:none;cursor:pointer}
 
-/* ----- SEMANA (dias) ----- */
-.semana-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* mobile */
-  gap: 14px;
-}
-
-.dia {
-  background: #1c1c1c;
-  padding: 18px;
-  border-radius: 14px;
-  cursor: pointer;
-  text-align: center;
-  font-weight: 600;
-  border: 1px solid #292929;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
-  transition: all 0.15s ease;
-}
-
-.dia:hover {
-  background: #262626;
-  transform: translateY(-4px);
-}
-
-/* Tablets e desktop */
-@media (min-width: 640px) {
-  .semana-container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* ----- HORAS ----- */
-.horas-container {
-  margin-top: 16px;
-}
-
-.voltar {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  background: #222;
-  color: #ccc;
-  font-size: 14px;
-  cursor: pointer;
-  border: 1px solid #333;
-}
-
-.voltar:hover {
-  background: #2e2e2e;
-}
-
-#titulo-dia {
-  font-size: 18px;
-  margin: 12px 0;
-  font-weight: 600;
-}
-
-.grade-horas {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr); /* mobile */
-  gap: 12px;
-}
-
-@media (min-width: 480px) {
-  .grade-horas {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.hora {
-  background: #1c1c1c;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid #292929;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.25);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.hora:hover {
-  background: #262626;
-  transform: scale(1.02);
-}
-
-.hora small {
-  color: #aaa;
-  font-size: 12px;
-}
-
-.hora .texto-atividade {
-  margin-top: 6px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* Ícone de notificação */
-.hora .notif-icone {
-  font-size: 12px;
-  color: #4fa3ff;
-  margin-top: 4px;
-}
-
-/* ----- MODAL ----- */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 40;
-  padding: 16px;
-}
-
-.modal-content {
-  background: #1a1a1a;
-  padding: 20px;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 420px;
-  border: 1px solid #333;
-  box-shadow: 0 8px 35px rgba(0,0,0,0.6);
-}
-
-.modal-content h3 {
-  margin-bottom: 12px;
-  font-size: 17px;
-  font-weight: 600;
-}
-
-.modal-content input[type="text"] {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #3a3a3a;
-  background: #121212;
-  color: #eee;
-  margin-bottom: 12px;
-}
-
-.notif {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-  font-size: 14px;
-  color: #ccc;
-}
-
-.modal-content button {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.salvar {
-  background: #007bff;
-  color: white;
-}
-
-.cancelar {
-  background: #333;
-  color: #ccc;
-}
-
-.hidden {
-  display: none;
-}
+/* hidden */
+.hidden{display:none}

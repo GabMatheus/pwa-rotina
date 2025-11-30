@@ -1,63 +1,72 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Minha Rotina - Calendário</title>
 
-    <title>Planner Semanal</title>
-
-    <link rel="stylesheet" href="style.css">
-
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
-
-<header>
-    <h1>Minha Rotina</h1>
-</header>
-
-<main>
-
-    <!-- Tela da Semana -->
-    <section id="semana">
-        <div class="semana-container">
-            <div class="dia" data-dia="Segunda">Segunda</div>
-            <div class="dia" data-dia="Terça">Terça</div>
-            <div class="dia" data-dia="Quarta">Quarta</div>
-            <div class="dia" data-dia="Quinta">Quinta</div>
-            <div class="dia" data-dia="Sexta">Sexta</div>
-            <div class="dia" data-dia="Sábado">Sábado</div>
-        </div>
-    </section>
-
-    <!-- Tela das horas -->
-    <section id="tela-dia" class="hidden">
-        <button class="voltar" onclick="voltarSemana()">← Voltar</button>
-        <h2 id="titulo-dia"></h2>
-
-        <div class="grade-horas" id="grade-horas"></div>
-    </section>
-
-</main>
-
-<!-- MODAL -->
-<div id="modal" class="modal hidden">
-    <div class="modal-content">
-        <h3 id="modal-titulo"></h3>
-
-        <input type="text" id="input-atividade" placeholder="Digite sua atividade...">
-
-        <label class="notif">
-            <input type="checkbox" id="ativar-lembrete">
-            Ativar lembrete 🔔
-        </label>
-
-        <button class="salvar" onclick="salvarAtividade()">Salvar</button>
-        <button class="cancelar" onclick="fecharModal()">Cancelar</button>
+  <header>
+    <div class="cabecalho-inner">
+      <button id="btn-prev" class="nav-btn" aria-label="Mês anterior">◀</button>
+      <div id="mes-ano" class="mes-ano">Mês Ano</div>
+      <button id="btn-next" class="nav-btn" aria-label="Próximo mês">▶</button>
     </div>
-</div>
+    <div class="acoes">
+      <button id="btn-apply-rest" class="acao-btn">Aplicar ao resto do mês</button>
+      <button id="btn-copy-week" class="acao-btn">Salvar próxima semana</button>
+      <button id="btn-copy-day" class="acao-btn">Salvar próximo dia</button>
+    </div>
+  </header>
 
-<script src="script.js"></script>
+  <main>
+    <section class="calendario-wrap">
+      <div class="dias-nomes">
+        <!-- Segunda -> Domingo (iniciando na segunda) -->
+        <div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div><div>Dom</div>
+      </div>
+
+      <div id="grid-calendario" class="grid-calendario">
+        <!-- Gerado via JS -->
+      </div>
+    </section>
+
+    <!-- Tela dia / horas -->
+    <section id="tela-dia" class="tela-dia hidden">
+      <div class="top-dia">
+        <button id="btn-voltar" class="voltar">← Voltar</button>
+        <h2 id="titulo-dia">Dia</h2>
+      </div>
+
+      <div id="grade-horas" class="grade-horas">
+        <!-- gerado via JS -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal simples para confirmação/edição -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="modal-titulo">Editar atividade</h3>
+
+      <input id="modal-input" type="text" placeholder="Ex: Estudar / Treinar / Almoço" />
+
+      <label class="notif">
+        <input id="modal-checkbox" type="checkbox" />
+        Ativar lembrete 🔔
+      </label>
+
+      <div class="modal-actions">
+        <button id="modal-save" class="salvar">Salvar</button>
+        <button id="modal-cancel" class="cancelar">Cancelar</button>
+        <button id="modal-delete" class="danger">Apagar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
