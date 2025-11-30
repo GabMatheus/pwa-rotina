@@ -1,52 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Rotina Semanal</title>
+    <title>Planner Semanal</title>
 
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
 
-    <script defer src="script.js"></script>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
-    <header>
-        <h1>Minha Rotina Semanal</h1>
-    </header>
+<header>
+    <h1>Minha Rotina</h1>
+</header>
 
-    <main>
-        <div id="semana" class="semana-container">
-            <!-- Gerado via JS -->
+<main>
+
+    <!-- Tela da Semana -->
+    <section id="semana">
+        <div class="semana-container">
+            <div class="dia" data-dia="Segunda">Segunda</div>
+            <div class="dia" data-dia="Terça">Terça</div>
+            <div class="dia" data-dia="Quarta">Quarta</div>
+            <div class="dia" data-dia="Quinta">Quinta</div>
+            <div class="dia" data-dia="Sexta">Sexta</div>
+            <div class="dia" data-dia="Sábado">Sábado</div>
         </div>
+    </section>
 
-        <div id="horas-container" class="horas-container hidden">
-            <button id="btn-voltar" class="voltar">← Voltar</button>
-            <h2 id="titulo-dia"></h2>
+    <!-- Tela das horas -->
+    <section id="tela-dia" class="hidden">
+        <button class="voltar" onclick="voltarSemana()">← Voltar</button>
+        <h2 id="titulo-dia"></h2>
 
-            <div id="grade-horas" class="grade-horas">
-                <!-- Gerado via JS -->
-            </div>
-        </div>
-    </main>
+        <div class="grade-horas" id="grade-horas"></div>
+    </section>
 
-    <!-- Modal para adicionar atividade -->
-    <div id="modal" class="modal hidden">
-        <div class="modal-content">
-            <h3 id="modal-hora"></h3>
-            <input id="input-atividade" placeholder="Ex: Estudar, Treinar..." />
-            
-            <label class="notif">
-                <input type="checkbox" id="ativar-notificacao" />
-                Ativar lembrete dessa atividade
-            </label>
+</main>
 
-            <button id="salvar">Salvar</button>
-            <button id="cancelar" class="cancelar">Cancelar</button>
-        </div>
+<!-- MODAL -->
+<div id="modal" class="modal hidden">
+    <div class="modal-content">
+        <h3 id="modal-titulo"></h3>
+
+        <input type="text" id="input-atividade" placeholder="Digite sua atividade...">
+
+        <label class="notif">
+            <input type="checkbox" id="ativar-lembrete">
+            Ativar lembrete 🔔
+        </label>
+
+        <button class="salvar" onclick="salvarAtividade()">Salvar</button>
+        <button class="cancelar" onclick="fecharModal()">Cancelar</button>
     </div>
+</div>
 
+<script src="script.js"></script>
 </body>
 </html>

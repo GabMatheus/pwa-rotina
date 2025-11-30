@@ -1,91 +1,123 @@
-const dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+// ---------------------
+// DADOS
+// ---------------------
+let diaSelecionado = "";
+let horaSelecionada = "";
 
-const semanaDiv = document.getElementById("semana");
-const horasContainer = document.getElementById("horas-container");
-const tituloDia = document.getElementById("titulo-dia");
+const horasDia = [];
+for (let h = 6; h <= 22; h++) {
+    horasDia.push(`${String(h).padStart(2, "0")}:00`);
+}
+
+// ---------------------
+// ELEMENTOS
+// ---------------------
+const telaSemana = document.getElementById("semana");
+const telaDia = document.getElementById("tela-dia");
 const gradeHoras = document.getElementById("grade-horas");
 
 const modal = document.getElementById("modal");
 const inputAtividade = document.getElementById("input-atividade");
-const modalHora = document.getElementById("modal-hora");
-const ativarNotificacao = document.getElementById("ativar-notificacao");
+const ativarLembrete = document.getElementById("ativar-lembrete");
 
-let diaAtual = "";
-let horaAtual = "";
-
-// Cria dias
-dias.forEach(dia => {
-    const div = document.createElement("div");
-    div.className = "dia";
-    div.textContent = dia;
-    div.onclick = () => abrirDia(dia);
-    semanaDiv.appendChild(div);
+// ---------------------
+// EVENTOS DOS DIAS
+// ---------------------
+document.querySelectorAll(".dia").forEach(d => {
+    d.addEventListener("click", () => abrirDia(d.dataset.dia));
 });
 
-// Abre grade de horas do dia
+// ---------------------
+// FUNÇÕES DE TELAS
+// ---------------------
 function abrirDia(dia) {
-    diaAtual = dia;
-    semanaDiv.classList.add("hidden");
-    horasContainer.classList.remove("hidden");
+    diaSelecionado = dia;
 
-    tituloDia.textContent = dia;
+    document.getElementById("titulo-dia").innerText = dia;
+    telaSemana.classList.add("hidden");
+    telaDia.classList.remove("hidden");
+
+    montarHoras();
+}
+
+function voltarSemana() {
+    telaDia.classList.add("hidden");
+    telaSemana.classList.remove("hidden");
+}
+
+// ---------------------
+// MONTAR GRADE DE HORAS
+// ---------------------
+function montarHoras() {
     gradeHoras.innerHTML = "";
 
-    for (let h = 6; h <= 22; h++) {
+    horasDia.forEach(h => {
+        const chave = `${diaSelecionado}-${h}`;
+        const salvo = JSON.parse(localStorage.getItem(chave));
+
         const div = document.createElement("div");
-        div.className = "hora";
+        div.classList.add("hora");
+        div.dataset.hora = h;
 
-        const texto = `${String(h).padStart(2, "0")}:00`;
-        div.textContent = texto;
+        div.innerHTML = `
+            <small>${h}</small>
+            <div class="texto-atividade">${salvo?.texto || ""}</div>
+            ${salvo?.lembrete ? '<div class="notif-icone">🔔</div>' : ''}
+        `;
 
-        div.onclick = () => abrirModal(texto);
-
+        div.addEventListener("click", () => abrirModal(h));
         gradeHoras.appendChild(div);
-    }
-}
-
-// Modal para salvar atividade
-function abrirModal(hora) {
-    modal.classList.remove("hidden");
-    modalHora.textContent = `${diaAtual} — ${hora}`;
-    horaAtual = hora;
-}
-
-// Botão cancelar
-document.getElementById("cancelar").onclick = () => {
-    modal.classList.add("hidden");
-    inputAtividade.value = "";
-    ativarNotificacao.checked = false;
-};
-
-// Salvar atividade
-document.getElementById("salvar").onclick = () => {
-    const atividade = inputAtividade.value;
-
-    if (!atividade) return alert("Digite uma atividade!");
-
-    const chave = `atividade-${diaAtual}-${horaAtual}`;
-    localStorage.setItem(chave, atividade);
-
-    if (ativarNotificacao.checked) agendarNotificacao(atividade);
-
-    modal.classList.add("hidden");
-    inputAtividade.value = "";
-    ativarNotificacao.checked = false;
-};
-
-// Notificação local
-async function agendarNotificacao(atividade) {
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") return;
-
-    new Notification("Lembrete", {
-        body: atividade,
     });
 }
 
-// Botão voltar
-document.getElementById("btn-voltar").onclick = () => {
-    horasContainer.classList.add("hidden");
-    semanaDiv.classList.remove("hidden");
-};
+// ---------------------
+// MODAL
+// ---------------------
+function abrirModal(hora) {
+    horaSelecionada = hora;
+
+    const chave = `${diaSelecionado}-${hora}`;
+    const salvo = JSON.parse(localStorage.getItem(chave));
+
+    document.getElementById("modal-titulo").innerText = `${diaSelecionado} - ${hora}`;
+
+    inputAtividade.value = salvo?.texto || "";
+    ativarLembrete.checked = salvo?.lembrete || false;
+
+    modal.classList.remove("hidden");
+    inputAtividade.focus();
+}
+
+function fecharModal() {
+    modal.classList.add("hidden");
+}
+
+// ---------------------
+// SALVAR ATIVIDADE
+// ---------------------
+function salvarAtividade() {
+    const chave = `${diaSelecionado}-${horaSelecionada}`;
+
+    const dados = {
+        texto: inputAtividade.value.trim(),
+        lembrete: ativarLembrete.checked
+    };
+
+    localStorage.setItem(chave, JSON.stringify(dados));
+
+    fecharModal();
+    montarHoras(); // atualizar tela
+
+    if (dados.lembrete) {
+        solicitarPermissaoNotificacao();
+    }
+}
+
+// ---------------------
+// NOTIFICAÇÕES
+// ---------------------
+function solicitarPermissaoNotificacao() {
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+}
