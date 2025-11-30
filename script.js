@@ -1,3 +1,14 @@
+/* ========= CONFIG & TEST MODE ======= */
+// se true: agenda o alarme para 1 minuto no futuro (para testes rápidos)
+const TEST_MODE = false;
+
+if ("Notification" in window) {
+  // pede permissão uma vez ao carregar o app (mostra prompt)
+  Notification.requestPermission().then((perm) => {
+    console.log("Permissão de notificação:", perm);
+  }).catch(()=>{});
+}
+
 /* ========= Config ======= */
 const FIRST_HOUR = 5;
 const LAST_HOUR = 23;
@@ -48,6 +59,10 @@ viewDate.setDate(1);
 
 let selectedDay = null; // 'YYYY-MM-DD'
 let selectedTime = null; // 'HH:MM'
+
+// Map para manter timers agendados na sessão atual e evitar duplicatas
+// chave: `${ymd}|${time}`
+const scheduledAlarms = new Map();
 
 /* ========= Inicial ======= */
 renderCalendar(viewDate);
@@ -156,6 +171,12 @@ function renderCalendar(baseDate) {
 
     grid.appendChild(card);
   }
+
+  // Depois de renderizar o calendário, agendamos alarmes para o mês visível
+  // Mas só se a tela do calendário estiver visível (não sobrescrever quando no detalhe de dia)
+  if (document.querySelector(".calendario-wrap") && document.querySelector(".calendario-wrap").classList.contains("hidden") === false) {
+    scheduleAlarmsForVisibleMonth(baseDate);
+  }
 }
 
 /* ========= Navegação e listeners ======= */
@@ -186,10 +207,26 @@ function setupListeners() {
 /* ========= Dia -> Horas ======= */
 function openDay(ymd) {
   selectedDay = ymd;
-  tituloDia.textContent = dateFromYMD(ymd).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "2-digit", year: "numeric" });
+
+  tituloDia.textContent = dateFromYMD(ymd).toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+
   document.querySelector(".calendario-wrap").classList.add("hidden");
   telaDia.classList.remove("hidden");
+
   renderHoursForDay(ymd);
+
+  // 🔔 Reagendar alarmes das atividades desse dia
+  const saved = JSON.parse(localStorage.getItem(`rotina-${ymd}`) || "null") || {};
+  Object.keys(saved).forEach(t => {
+    if (saved[t].lembrete) {
+      scheduleAlarm(ymd, t, saved[t].texto);
+    }
+  });
 }
 
 function renderHoursForDay(ymd) {
@@ -240,7 +277,8 @@ function renderHoursForDay(ymd) {
 /* ========= Modal handling ======= */
 function openModalForTime(time, existing) {
   selectedTime = time;
-  modalTitle.textContent = `${new Date(selectedDay).toLocaleDateString("pt-BR")} • ${time}`;
+  // use dateFromYMD to avoid timezone shift
+  modalTitle.textContent = `${dateFromYMD(selectedDay).toLocaleDateString("pt-BR")} • ${time}`;
   modalInput.value = existing?.texto || "";
   modalCheckbox.checked = !!existing?.lembrete;
   modal.classList.remove("hidden");
@@ -262,13 +300,13 @@ function onModalSave() {
   const lemb = modalCheckbox.checked;
 
   if (!text) {
-    // if empty, remove entry
     delete stored[selectedTime];
+    // se remover lembrete, cancelar alarmes agendados para este horário
+    cancelScheduledAlarm(`${selectedDay}|${selectedTime}`);
   } else {
     stored[selectedTime] = { texto: text, lembrete: lemb };
   }
 
-  // if no keys remain, remove key
   if (Object.keys(stored).length === 0) {
     localStorage.removeItem(key);
   } else {
@@ -277,8 +315,21 @@ function onModalSave() {
 
   closeModal();
   renderHoursForDay(selectedDay);
-  renderCalendar(viewDate); // refresh preview on calendar
-  if (lemb) Notification.requestPermission().catch(()=>{}); // request permission
+  renderCalendar(viewDate);
+
+  if (lemb && text) {
+    // pede permissão e, se concedida, agenda o alarme
+    Notification.requestPermission().then((perm) => {
+      if (perm === "granted") {
+        scheduleAlarm(selectedDay, selectedTime, text);
+      } else {
+        console.log("Permissão de notificação não concedida:", perm);
+      }
+    }).catch(()=>{});
+  } else {
+    // se desmarcou lembrete, certificar-se que não há timer pendente
+    cancelScheduledAlarm(`${selectedDay}|${selectedTime}`);
+  }
 }
 
 function onModalDelete() {
@@ -288,6 +339,9 @@ function onModalDelete() {
   delete stored[selectedTime];
   if (Object.keys(stored).length === 0) localStorage.removeItem(key);
   else localStorage.setItem(key, JSON.stringify(stored));
+
+  // cancelar alarm
+  cancelScheduledAlarm(`${selectedDay}|${selectedTime}`);
 
   closeModal();
   renderHoursForDay(selectedDay);
@@ -370,12 +424,109 @@ function startAutoAdvanceCheck() {
       currentMonth = now.getMonth();
       // update viewDate to new month automatically (Option 1)
       viewDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      renderCalendar(viewDate);
+      // apenas renderiza se não estiver no detalhe do dia (evita sobrescrever tela aberta)
+      if (document.querySelector(".calendario-wrap") && document.querySelector(".calendario-wrap").classList.contains("hidden") === false) {
+        renderCalendar(viewDate);
+      }
     } else {
-      // still update "today" highlights & disabled days in the current view
-      renderCalendar(viewDate);
+      // atualiza highlights sem forçar perder contexto: se calendar estiver visível, re-render; se estiver no detalhe, apenas torna invisíveis os dias passados (simples solução)
+      if (document.querySelector(".calendario-wrap") && document.querySelector(".calendario-wrap").classList.contains("hidden") === false) {
+        renderCalendar(viewDate);
+      } else {
+        // se estiver no detalhe (telaDia aberta), atualiza a grade de horas (para bloquear/mostrar mudanças de "today")
+        if (selectedDay) renderHoursForDay(selectedDay);
+      }
     }
-  }, 30 * 1000); // checa a cada 30s
+  }, 30 * 1000);
+}
+
+/* ========= helpers de agendamento ======= */
+function alarmKey(ymd, time) {
+  return `${ymd}|${time}`;
+}
+function cancelScheduledAlarm(key) {
+  const item = scheduledAlarms.get(key);
+  if (item) {
+    clearTimeout(item.timeoutId);
+    scheduledAlarms.delete(key);
+    console.log("Alarm cancelled:", key);
+  }
+}
+
+/* scheduleAlarm:
+   - agenda notificação 20 minutos antes (ou 1 minuto se TEST_MODE)
+   - evita duplicados dentro da sessão
+*/
+function scheduleAlarm(ymd, time, text) {
+  const key = alarmKey(ymd, time);
+
+  // se já existe um timer para essa chave, cancelamos e re-agendamos
+  if (scheduledAlarms.has(key)) {
+    cancelScheduledAlarm(key);
+  }
+
+  // constroi o datetime local do evento
+  const [h, m] = time.split(":").map(Number);
+  const eventDate = dateFromYMD(ymd);
+  eventDate.setHours(h, m, 0, 0);
+
+  let alarmTime;
+  if (TEST_MODE) {
+    // para testes: tocar em 1 minuto
+    alarmTime = new Date(Date.now() + 60 * 1000);
+  } else {
+    // horário real: 20 minutos antes
+    alarmTime = new Date(eventDate.getTime() - 20 * 60 * 1000);
+  }
+
+  const now = new Date();
+  if (alarmTime <= now) {
+    // já passou; não agendamos
+    return;
+  }
+
+  const delay = alarmTime - now;
+
+  const timeoutId = setTimeout(() => {
+    // checar permissão
+    if (Notification.permission === "granted") {
+      try {
+        new Notification("Lembrete da sua atividade", {
+          body: `${time} — ${text}`,
+          tag: key
+        });
+      } catch (e) {
+        console.error("Erro exibindo notificação:", e);
+      }
+    } else {
+      console.log("Notificação não enviada — permissão não concedida.");
+    }
+    // remover do mapa depois de disparado
+    scheduledAlarms.delete(key);
+  }, delay);
+
+  scheduledAlarms.set(key, { timeoutId, alarmTime });
+  console.log("Alarm scheduled", key, "at", alarmTime.toString());
+}
+
+/* agenda alarmes para os dias do mês visível (somente do hoje em diante) */
+function scheduleAlarmsForVisibleMonth(baseDate) {
+  const year = baseDate.getFullYear();
+  const month = baseDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = todayLocal();
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateObj = new Date(year, month, d);
+    if (dateObj < today) continue; // só daqui pra frente
+    const ymd = formatDateYMD(dateObj);
+    const stored = JSON.parse(localStorage.getItem(`rotina-${ymd}`) || "null") || {};
+    Object.keys(stored).forEach(t => {
+      if (stored[t].lembrete) {
+        scheduleAlarm(ymd, t, stored[t].texto);
+      }
+    });
+  }
 }
 
 /* ========= Refresh quando voltar ao mês atual (se usuário navegar) ======= */
